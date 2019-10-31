@@ -1,14 +1,15 @@
-FROM php:7.2-fpm
+FROM indexyz/php
+LABEL maintainer="Indexyz <indexyz@protonmail.com>"
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY . /var/www
 WORKDIR /var/www
 
 RUN cp config/.config.example.php config/.config.php 
-VOLUME ./config /var/www/config
 RUN chmod -R 755 storage 
 RUN chmod -R 777 /var/www/storage/framework/smarty/compile/ 
-RUN composer install 
+RUN curl -SL https://getcomposer.org/installer -o composer-setup.php 
+RUN php composer-setup.php 
+RUN php composer.phar install 
 RUN php xcat initQQWry 
 RUN php xcat initdownload 
 RUN crontab -l | { cat; echo "30 22 * * * php /var/www/xcat sendDiaryMail"; } | crontab - 

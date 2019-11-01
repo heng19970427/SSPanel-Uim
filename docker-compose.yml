@@ -1,0 +1,8 @@
+version: '2.1'
+
+services:
+  sspanel-uim:
+    image: sspanel-uim
+    build: .
+    ports:
+      - 9000:9000

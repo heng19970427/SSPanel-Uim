@@ -44,4 +44,4 @@ CMD sed -i "/_ENV\['key'\] =/c \$_ENV\['key'\] = '$KEY';" config/.config.php &&\
     sed -i "/_ENV\['db_database'\] =/c \$_ENV\['db_database'\] = '$MYSQL_DB';/g" config/.config.php &&\
     sed -i "/_ENV\['db_username'\] =/c \$_ENV\['db_username'\] = '$MYSQL_USER';/g" config/.config.php &&\
     sed -i "/_ENV\['db_password'\] =/c \$_ENV\['db_password'\] = '$MYSQL_PASSWORD';/g" config/.config.php &&\
-    php -S 0000:9000 -t /sspanel/public 
+    php -S 0000:9000 -t /var/www/public

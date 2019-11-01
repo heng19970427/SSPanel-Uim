@@ -25,14 +25,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install -j$(nproc) bcmath 
 RUN cp config/.config.example.php config/.config.php 
-RUN sed -i "s/_ENV\['key'\] =/_ENV\['key'\] = '$KEY';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['appName'\] =/_ENV\['appName'\] = '$SITE_NAME';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['baseUrl'\] =/_ENV\['baseUrl'\] = '$BASEURL';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['muKey'\] =/_ENV\['muKey'\] = '$TOKEN';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['db_host'\] =/_ENV\['db_host'\] = '$MYSQL_HOST';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['db_database'\] =/_ENV\['db_database'\] = '$MYSQL_DB';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['db_username'\] =/_ENV\['db_username'\] = '$MYSQL_USER';\/\//g" config/.config.php
-RUN sed -i "s/_ENV\['db_password'\] =/_ENV\['db_password'\] = '$MYSQL_PASSWORD';\/\//g" config/.config.php
 RUN chmod -R 755 storage 
 RUN chmod -R 777 /var/www/storage/framework/smarty/compile/ 
 RUN composer install 
@@ -42,3 +34,14 @@ RUN crontab -l | { cat; echo "30 22 * * * php /var/www/xcat sendDiaryMail"; } | 
 RUN crontab -l | { cat; echo "0 0 * * * php /var/www/xcat dailyjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat checkjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | crontab - 
+EXPOSE 9000
+
+CMD sed -i "/_ENV\['key'\] =/c \$_ENV\['key'\] = '$KEY';" config/.config.php &&\
+    sed -i "/_ENV\['appName'\] =/c \$_ENV\['appName'\] = '$SITE_NAME';/g" config/.config.php &&\
+    sed -i "/_ENV\['baseUrl'\] =/c \$_ENV\['baseUrl'\] = '$BASEURL';/g" config/.config.php &&\
+    sed -i "/_ENV\['muKey'\] =/c \$_ENV\['muKey'\] = '$TOKEN';/g" config/.config.php &&\
+    sed -i "/_ENV\['db_host'\] =/c \$_ENV\['db_host'\] = '$MYSQL_HOST';/g" config/.config.php &&\
+    sed -i "/_ENV\['db_database'\] =/c \$_ENV\['db_database'\] = '$MYSQL_DB';/g" config/.config.php &&\
+    sed -i "/_ENV\['db_username'\] =/c \$_ENV\['db_username'\] = '$MYSQL_USER';/g" config/.config.php &&\
+    sed -i "/_ENV\['db_password'\] =/c \$_ENV\['db_password'\] = '$MYSQL_PASSWORD';/g" config/.config.php &&\
+    php -S 0000:9000 -t /sspanel/public 

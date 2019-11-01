@@ -37,11 +37,11 @@ RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | cront
 EXPOSE 9000
 
 CMD sed -i "/_ENV\['key'\] =/c \$_ENV\['key'\] = '$KEY';" config/.config.php &&\
-    sed -i "/_ENV\['appName'\] =/c \$_ENV\['appName'\] = '$SITE_NAME';/g" config/.config.php &&\
-    sed -i "/_ENV\['baseUrl'\] =/c \$_ENV\['baseUrl'\] = '$BASEURL';/g" config/.config.php &&\
-    sed -i "/_ENV\['muKey'\] =/c \$_ENV\['muKey'\] = '$TOKEN';/g" config/.config.php &&\
-    sed -i "/_ENV\['db_host'\] =/c \$_ENV\['db_host'\] = '$MYSQL_HOST';/g" config/.config.php &&\
-    sed -i "/_ENV\['db_database'\] =/c \$_ENV\['db_database'\] = '$MYSQL_DB';/g" config/.config.php &&\
-    sed -i "/_ENV\['db_username'\] =/c \$_ENV\['db_username'\] = '$MYSQL_USER';/g" config/.config.php &&\
-    sed -i "/_ENV\['db_password'\] =/c \$_ENV\['db_password'\] = '$MYSQL_PASSWORD';/g" config/.config.php &&\
-    php -S 0000:9000 -t /var/www/public
+    sed -i "/_ENV\['appName'\] =/c \$_ENV\['appName'\] = '$SITE_NAME';" config/.config.php &&\
+    sed -i "/_ENV\['baseUrl'\] =/c \$_ENV\['baseUrl'\] = '$BASEURL';" config/.config.php &&\
+    sed -i "/_ENV\['muKey'\] =/c \$_ENV\['muKey'\] = '$TOKEN';" config/.config.php &&\
+    sed -i "/_ENV\['db_host'\] =/c \$_ENV\['db_host'\] = '$MYSQL_HOST';" config/.config.php &&\
+    sed -i "/_ENV\['db_database'\] =/c \$_ENV\['db_database'\] = '$MYSQL_DB';" config/.config.php &&\
+    sed -i "/_ENV\['db_username'\] =/c \$_ENV\['db_username'\] = '$MYSQL_USER';" config/.config.php &&\
+    sed -i "/_ENV\['db_password'\] =/c \$_ENV\['db_password'\] = '$MYSQL_PASSWORD';" config/.config.php &&\
+    php -S 0000:9000 -t /var/www/public 

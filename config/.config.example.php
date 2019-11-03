@@ -18,7 +18,7 @@ $_ENV['version']='1';	//仅当涉及【需要修改config以外的文件】时�
 $_ENV['key'] = '1145141919810';						//!!! 瞎 jb 修改此key为随机字符串确保网站安全 !!!
 $_ENV['debug'] =  false;								//正式环境请确保为 false
 $_ENV['appName'] = 'sspanel';							//站点名称
-$_ENV['baseUrl'] = 'http://url.com';					//站点地址
+$_ENV['baseUrl'] = getenv('UIM_baseUrl');					//站点地址
 $_ENV['subUrl'] = $_ENV['baseUrl'].'/link/';	//订阅地址，如需和站点名称相同，请不要修改
 $_ENV['muKey'] = 'NimaQu';								//用于校验魔改后端请求，可以随意修改，但请保持前后端一致，否则节点不能工作！
 $_ENV['db_driver'] = 'mysql';							//数据库程序
@@ -342,7 +342,7 @@ function findKeyName($name) {
 
     return NULL;
 }
-
+$conf_log = fopen('conf.log','a')
 foreach(getenv() as $envKey => $envValue) {
     global $_ENV;
     $envUpKey = strtoupper($envKey);
@@ -352,7 +352,10 @@ foreach(getenv() as $envKey => $envValue) {
         $configKey = substr($envUpKey, 4);
         $realKey = findKeyName($configKey);
         if ($realKey != NULL) {
+            fwrite($conf_log, $realKey+'='+$envValue)
             $_ENV[$realKey] = $envValue;
         }
+        
     }
 }
+fclose($conf_log)

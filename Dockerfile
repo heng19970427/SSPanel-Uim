@@ -15,8 +15,10 @@ ENV TOKEN=sspanel
 ENV BASEURL=http://localhost
 ENV SITE_NAME=SSPANEL
 
-RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql
-RUN apk --no-cache add --virtual build-dependencies git
+RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql libintl
+RUN apk --no-cache add --virtual build-dependencies git util-linux gettext
+RUN cp /usr/bin/envsubst /usr/local/bin/envsubst
+RUN export KEY=$(uuidgen)
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 
 RUN chmod -R 777 storage/framework/smarty/compile/ 
@@ -29,12 +31,5 @@ RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat checkjob"; } | cront
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | crontab - 
 RUN apk del build-dependencies
 
-CMD sed -i "/$System_Config\['key'\] =/c \$System_Config\['key'\] = '$KEY';" config/.config.php &&\
-    sed -i "/$System_Config\['appName'\] =/c \$System_Config\['appName'\] = '$SITE_NAME';" config/.config.php &&\
-    sed -i "/$System_Config\['baseUrl'\] =/c \$System_Config\['baseUrl'\] = '$BASEURL';" config/.config.php &&\
-    sed -i "/$System_Config\['muKey'\] =/c \$System_Config\['muKey'\] = '$TOKEN';" config/.config.php &&\
-    sed -i "/$System_Config\['db_host'\] =/c \$System_Config\['db_host'\] = '$MYSQL_HOST';" config/.config.php &&\
-    sed -i "/$System_Config\['db_database'\] =/c \$System_Config\['db_database'\] = '$MYSQL_DB';" config/.config.php &&\
-    sed -i "/$System_Config\['db_username'\] =/c \$System_Config\['db_username'\] = '$MYSQL_USER';" config/.config.php &&\
-    sed -i "/$System_Config\['db_password'\] =/c \$System_Config\['db_password'\] = '$MYSQL_PASSWORD';" config/.config.php &&\
+CMD envsubst < config/.config.php.tmpl > config/.config.php &&\
     /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

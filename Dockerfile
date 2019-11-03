@@ -1,32 +1,26 @@
-FROM php:7.2-fpm
-
+FROM trafex/alpine-nginx-php7:ba1dd422
+# 从composer 镜像中获取composer二进制程序
 COPY --from=composer /usr/bin/composer /usr/bin/composer
-COPY . /var/www
-WORKDIR /var/www
 
-ENV MYSQL_HOST=localhost
-ENV MYSQL_DB=sspanel
-ENV MYSQL_USER=root
-ENV MYSQL_PASSWORD=root
-ENV KEY=asdfghjkl
-ENV TOKEN=sspanel
-ENV BASEURL=http://localhost
-ENV SITE_NAME=SSPANEL
+WORKDIR /app
+COPY . /app
+RUN sed -i 's/\/var\/www\/html/\/app\/public/g' /etc/nginx/nginx.conf
 
-RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    git \
-    zip \
-    cron \
-    && docker-php-ext-install -j$(nproc) iconv \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install -j$(nproc) bcmath 
+ENV UIM_db_host=localhost
+ENV UIM_db_database=sspanel
+ENV UIM_db_username=root
+ENV UIM_db_password=root
+ENV UIM_key=asdfghjkl
+ENV UIM_muKey=sspanel
+ENV UIM_baseUrl=http://localhost
+ENV UIM_appName=SSPANEL
+
+RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql
+RUN apk --no-cache add --virtual build-dependencies git util-linux
+RUN export UIM_key=$(uuidgen)
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 
-RUN chmod -R 777 /var/www/storage/framework/smarty/compile/ 
+RUN chmod -R 777 storage/framework/smarty/compile/ 
 RUN composer install 
 RUN php xcat initQQWry 
 RUN php xcat initdownload 
@@ -34,14 +28,6 @@ RUN crontab -l | { cat; echo "30 22 * * * php /var/www/xcat sendDiaryMail"; } | 
 RUN crontab -l | { cat; echo "0 0 * * * php /var/www/xcat dailyjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat checkjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | crontab - 
-EXPOSE 9000
+RUN apk del build-dependencies
 
-CMD sed -i "/_ENV\['key'\] =/c \$_ENV\['key'\] = '$KEY';" config/.config.php &&\
-    sed -i "/_ENV\['appName'\] =/c \$_ENV\['appName'\] = '$SITE_NAME';" config/.config.php &&\
-    sed -i "/_ENV\['baseUrl'\] =/c \$_ENV\['baseUrl'\] = '$BASEURL';" config/.config.php &&\
-    sed -i "/_ENV\['muKey'\] =/c \$_ENV\['muKey'\] = '$TOKEN';" config/.config.php &&\
-    sed -i "/_ENV\['db_host'\] =/c \$_ENV\['db_host'\] = '$MYSQL_HOST';" config/.config.php &&\
-    sed -i "/_ENV\['db_database'\] =/c \$_ENV\['db_database'\] = '$MYSQL_DB';" config/.config.php &&\
-    sed -i "/_ENV\['db_username'\] =/c \$_ENV\['db_username'\] = '$MYSQL_USER';" config/.config.php &&\
-    sed -i "/_ENV\['db_password'\] =/c \$_ENV\['db_password'\] = '$MYSQL_PASSWORD';" config/.config.php &&\
-    php -S 0000:9000 -t /var/www/public 
+CMD /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

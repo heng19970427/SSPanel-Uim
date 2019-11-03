@@ -1,8 +1,16 @@
-version: '2.1'
+version: "2.1"
 
 services:
-  sspanel-uim:
-    image: sspanel-uim
-    build: .
-    ports:
-      - 9000:9000
+    sspanel-uim:
+        image: 1921558770/sspanel-uim:latest
+        ports:
+            - 80:80
+        environment:
+            - MYSQL_HOST=localhost
+            - MYSQL_DB=sspanel
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=root
+            - KEY=asdfghjkl
+            - TOKEN=sspanel
+            - BASEURL=http://localhost
+            - SITE_NAME=SSPANEL

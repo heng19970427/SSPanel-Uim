@@ -15,7 +15,7 @@ ENV TOKEN=sspanel
 ENV BASEURL=http://localhost
 ENV SITE_NAME=SSPANEL
 
-RUN apk --no-cache add php7-bcmath apk-cron
+RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql
 RUN apk --no-cache add --virtual git
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 

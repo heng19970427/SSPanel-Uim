@@ -16,7 +16,7 @@ ENV BASEURL=http://localhost
 ENV SITE_NAME=SSPANEL
 
 RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql
-RUN apk --no-cache add --virtual git
+RUN apk --no-cache add --virtual build-dependencies git
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 
 RUN chmod -R 777 storage/framework/smarty/compile/ 
@@ -27,6 +27,7 @@ RUN crontab -l | { cat; echo "30 22 * * * php /var/www/xcat sendDiaryMail"; } | 
 RUN crontab -l | { cat; echo "0 0 * * * php /var/www/xcat dailyjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat checkjob"; } | crontab - 
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | crontab - 
+RUN apk del build-dependencies
 
 CMD sed -i "/$System_Config\['key'\] =/c \$System_Config\['key'\] = '$KEY';" config/.config.php &&\
     sed -i "/$System_Config\['appName'\] =/c \$System_Config\['appName'\] = '$SITE_NAME';" config/.config.php &&\
@@ -36,4 +37,4 @@ CMD sed -i "/$System_Config\['key'\] =/c \$System_Config\['key'\] = '$KEY';" con
     sed -i "/$System_Config\['db_database'\] =/c \$System_Config\['db_database'\] = '$MYSQL_DB';" config/.config.php &&\
     sed -i "/$System_Config\['db_username'\] =/c \$System_Config\['db_username'\] = '$MYSQL_USER';" config/.config.php &&\
     sed -i "/$System_Config\['db_password'\] =/c \$System_Config\['db_password'\] = '$MYSQL_PASSWORD';" config/.config.php &&\
-    php -S 0000:9000 -t /var/www/public 
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

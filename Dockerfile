@@ -1,6 +1,7 @@
 FROM trafex/alpine-nginx-php7:ba1dd422
-
+# 从composer 镜像中获取composer二进制程序
 COPY --from=composer /usr/bin/composer /usr/bin/composer
+
 WORKDIR /app
 COPY . /app
 RUN sed -i 's/\/var\/www\/html/\/app\/public/g' /etc/nginx/nginx.conf
@@ -14,7 +15,7 @@ ENV TOKEN=sspanel
 ENV BASEURL=http://localhost
 ENV SITE_NAME=SSPANEL
 
-RUN apk --no-cache add php7-bcmath
+RUN apk --no-cache add php7-bcmath apk-cron
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 
 RUN chmod -R 777 storage/framework/smarty/compile/ 

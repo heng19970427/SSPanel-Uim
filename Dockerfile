@@ -6,18 +6,17 @@ WORKDIR /app
 COPY . /app
 RUN sed -i 's/\/var\/www\/html/\/app\/public/g' /etc/nginx/nginx.conf
 
-ENV MYSQL_HOST=localhost
-ENV MYSQL_DB=sspanel
-ENV MYSQL_USER=root
-ENV MYSQL_PASSWORD=root
-ENV KEY=asdfghjkl
-ENV TOKEN=sspanel
-ENV BASEURL=http://localhost
-ENV SITE_NAME=SSPANEL
+ENV UIM_db_host=localhost
+ENV UIM_db_database=sspanel
+ENV UIM_db_username=root
+ENV UIM_db_password=root
+ENV UIM_key=asdfghjkl
+ENV UIM_muKey=sspanel
+ENV UIM_baseUrl=http://localhost
+ENV UIM_appName=SSPANEL
 
-RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql libintl
-RUN apk --no-cache add --virtual build-dependencies git util-linux gettext
-RUN cp /usr/bin/envsubst /usr/local/bin/envsubst
+RUN apk --no-cache add php7-bcmath apk-cron php7-pdo php7-pdo_mysql
+RUN apk --no-cache add --virtual build-dependencies git util-linux
 RUN export KEY=$(uuidgen)
 RUN cp config/.config.example.php config/.config.php 
 RUN chmod -R 755 storage 
@@ -31,5 +30,4 @@ RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat checkjob"; } | cront
 RUN crontab -l | { cat; echo "*/1 * * * * php /var/www/xcat syncnode"; } | crontab - 
 RUN apk del build-dependencies
 
-CMD envsubst < config/.config.php.tmpl > config/.config.php &&\
-    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+CMD /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

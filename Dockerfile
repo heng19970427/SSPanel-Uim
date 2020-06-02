@@ -22,7 +22,6 @@ RUN cp config/.config.example.php config/.config.php
 RUN chmod -R 755 storage 
 RUN chmod -R 777 storage/framework/smarty/compile/ 
 RUN composer install 
-RUN php xcat initQQWry 
 RUN php xcat initdownload 
 RUN crontab -l | { cat; echo "30 22 * * * php /var/www/xcat sendDiaryMail"; } | crontab - 
 RUN crontab -l | { cat; echo "0 0 * * * php /var/www/xcat dailyjob"; } | crontab - 
